@@ -15,12 +15,12 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
 
       run_locally "bundle exec rails runner 'puts #{figaro_cmd}' > #{figaro_tmpfile}"
-      transfer :up, figaro_tmpfile, figaro_output, via: :scp
+      put File.read(figaro_tmpfile), figaro_output, mode: 0600
       run_locally "rm #{figaro_tmpfile}"
     end
 
     task :config_symlink, roles: :app do
-      run "ln -sf #{figaro_output} #{figaro_config}"
+      run "ln -nsf #{figaro_output} #{figaro_config}"
     end
   end
 
