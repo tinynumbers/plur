@@ -18,6 +18,14 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
   end
 
+  after 'deploy:start' do
+    upstart.start if plur_callback
+  end
+
+  before 'deploy:stop' do
+    upstart.stop if plur_callback
+  end
+
   after 'deploy:restart' do
     upstart.restart if plur_callback
   end
