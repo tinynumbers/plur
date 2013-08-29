@@ -14,6 +14,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       set :foreman_user,        user
       set :foreman_log,         'shared_path/log'
       set :foreman_concurrency, false
+      set :foreman_sudo,        sudo
     DESC
     task :export, roles: :app do
       bundle_cmd          = fetch(:bundle_cmd, "bundle")
@@ -26,6 +27,8 @@ Capistrano::Configuration.instance(:must_exist).load do
       foreman_user        = fetch(:foreman_user, user)
       foreman_log         = fetch(:foreman_log, "#{shared_path}/log")
       foreman_concurrency = fetch(:foreman_concurrency, false)
+      # foreman_sudo can be used if for example you need to use 'rbenv sudo' or 'rvmsudo' just for this one case
+      foreman_sudo        = fetch(:foreman_sudo, sudo)
 
       args = ["#{foreman_format} #{foreman_location}"]
       args << "-f #{foreman_procfile}"
@@ -35,7 +38,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       args << "-u #{foreman_user}"
       args << "-l #{foreman_log}"
       args << "-c #{foreman_concurrency}" if foreman_concurrency
-      run "cd #{release_path} && #{sudo} #{bundle_cmd} exec foreman export #{args.join(' ')}"
+      run "cd #{release_path} && #{foreman_sudo} #{bundle_cmd} exec foreman export #{args.join(' ')}"
     end
   end
 
